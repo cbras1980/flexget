@@ -58,10 +58,36 @@ templates:
 
 ##### Movies config
 #
+  movies-3d:
+    tmdb_lookup: yes
+    movie_list: trakt-movies
+    #quality:  webdl+ 
+    content_size:
+      min: 1000
+      max: 60000
+    regexp:
+      accept:
+        - (3D|3d)
+      reject:
+        - (2D|2d)
+      from: title
+
+  movies-2160p:
+    tmdb_lookup: yes
+    movie_list: trakt-movies
+    quality:  webdl+ 
+    content_size:
+      min: 2000
+      max: 60000
+    regexp:
+      accept:
+        - (2160p|4K|4k)
+      from: title
+      
   movies-1080p:
     tmdb_lookup: yes
     movie_list: trakt-movies
-    quality: 1080p webdl+ 
+    quality: 1080i+ hdtv+ 
     content_size:
       min: 500
       max: 6000
@@ -69,7 +95,7 @@ templates:
   movies-720p:
     tmdb_lookup: yes
     movie_list: trakt-movies
-    quality: 720p webdl+ 
+    quality: 720i+ hdtv+ 
     content_size:
       min: 250
       max: 3000
@@ -506,7 +532,77 @@ tasks:
           account: '{{secrets.trakt.account}}'
           list: '{{secrets.trakt.movies}}'
           type: movies
+          
+##### Discover and download 3D movies
+#
+  download-movies-3D-discover:
+    priority: 24
+    template:
+      - movies-3d
+      - reject
+      - torrents
+      - transmission-movies
+      - pushbullet
+    exists_movie:
+      - '/{{secrets.folder.root}}{{secrets.folder.downmovies}}'
+      - '/{{secrets.folder.root}}{{secrets.folder.movies}}'
+    discover:
+      release_estimations: loose
+      interval: 15 minutes
+      what:
+        - movie_list: trakt-movies
+      from:
+        - iptorrents: 
+            rss_key: '{{ secrets.iptorrents.rss_key }}' 
+            uid: 1486500 
+            password: '{{ secrets.iptorrents.password }}'
+            category:
+              - 87 #Movies 3D
+    list_match:
+      from:
+        - movie_list: trakt-movies
+    list_remove:
+      - trakt_list:
+          account: '{{secrets.trakt.account}}'
+          list: '{{secrets.trakt.movies}}'
+          type: movies
 
+##### Discover and download 2160p movies
+#
+  download-movies-2160p-discover:
+    priority: 25
+    template:
+      - movies-2160p
+      - reject
+      - torrents
+      - transmission-movies
+      - pushbullet
+    exists_movie:
+      - '/{{secrets.folder.root}}{{secrets.folder.downmovies}}'
+      - '/{{secrets.folder.root}}{{secrets.folder.movies}}'
+    discover:
+      release_estimations: loose
+      interval: 15 minutes
+      what:
+        - movie_list: trakt-movies
+      from:
+        - iptorrents: 
+            rss_key: '{{ secrets.iptorrents.rss_key }}' 
+            uid: 1486500 
+            password: '{{ secrets.iptorrents.password }}'
+            category: 
+              - 48 #Movie HD
+              - 20 #Movie Web DL
+              - 87 #Movies 3D
+    list_match:
+      from:
+        - movie_list: trakt-movies
+    list_remove:
+      - trakt_list:
+          account: '{{secrets.trakt.account}}'
+          list: '{{secrets.trakt.movies}}'
+          type: movies
+          
 
 ##### Discover and download 1080p movies
 #
@@ -532,12 +628,12 @@ tasks:
             uid: 1486500 
             password: '{{ secrets.iptorrents.password }}'
             category: 
-              #- Movie-HD-Bluray
-              #- Movie-MP4
-              #- Movie-BD-Rip
-              #- Movie-3D 
+              - Movie-HD-Bluray
+              - Movie-MP4
+              - Movie-BD-Rip
+              - Movie-3D 
               - 48 #Movie HD
-              #- 20 #Movie Web DL
+              - 20 #Movie Web DL
     list_match:
       from:
         - movie_list: trakt-movies
@@ -572,12 +668,12 @@ tasks:
             uid: 1486500 
             password: '{{ secrets.iptorrents.password }}'
             category: 
-              #- Movie-HD-Bluray
-              #- Movie-MP4
-              #- Movie-BD-Rip
-              #- Movie-3D 
+              - Movie-HD-Bluray
+              - Movie-MP4
+              - Movie-BD-Rip
+              - Movie-3D 
               - 48 #Movie HD
-              #- 20 #Movie Web DL
+              - 20 #Movie Web DL
 
     if:
       - tmdb_year > now.year - 1: reject
