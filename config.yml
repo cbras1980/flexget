@@ -32,13 +32,13 @@ templates:
         entry_list: trakt-series
       settings:
         identified_by: ep
-        timeframe: 16 hours
+        timeframe: 12 hours
         target: hdtv+ 1080p  h265
         quality: webrip+ 720p 
         propers: 12 hours
         specials: no
     content_size:
-      min: 350
+      min: 200
     content_filter:
       require:
         - '*.mkv'
@@ -61,33 +61,35 @@ templates:
   movies-3d:
     tmdb_lookup: yes
     movie_list: trakt-movies
-    #quality:  webdl+ 
-    content_size:
-      min: 1000
-      max: 15000
     regexp:
       accept:
         - (3D|3d)
       reject:
         - (2D|2d)
       from: title
-
+    quality:  webdl+ 
+    content_size:
+      min: 1000
+      max: 15000
+    
   movies-2160p:
     tmdb_lookup: yes
     movie_list: trakt-movies
-    #quality:  webdl+ 
-    content_size:
-      min: 2000
-      max: 60000
     regexp:
       accept:
         - (2160p|4K|4k)
+      reject:
+        - (480|720|1080)
       from: title
+    quality:  webdl+
+    content_size:
+      min: 2000
+      max: 60000
       
   movies-1080p:
     tmdb_lookup: yes
     movie_list: trakt-movies
-    quality: 1080i+ hdtv+ 
+    quality: 1080i+ hdtv+ h265
     content_size:
       min: 500
       max: 12000
@@ -861,3 +863,4 @@ tasks:
           account: '{{secrets.trakt.account}}'
           list: '{{secrets.trakt.series}}'
           type: shows
+
