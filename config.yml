@@ -66,17 +66,17 @@ templates:
   movies-3d:
     tmdb_lookup: yes
     movie_list: trakt-movies
+    quality:  1080p+ webdl+ 
+    content_size:
+      min: 1000
+      max: 15000
     regexp:
       accept:
         - (3D|3d)
       reject:
         - (2D|2d)
-      from: title
-    quality:  webdl+ 
-    content_size:
-      min: 1000
-      max: 15000
-    
+
+      
   movies-2160p-webdl:
     tmdb_lookup: yes
     movie_list: trakt-movies
@@ -155,7 +155,6 @@ templates:
       reject:
         - (s|d)ub(s|bed|lado|titulado)?\b
         - \bdual\b
-        - \b3d\b
         - \b(fr)(ench)?\b
         - \b(ita)(lian)?\b
         - \b(spa)(nish)?\b
