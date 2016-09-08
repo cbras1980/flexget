@@ -58,6 +58,11 @@ templates:
 
 ##### Movies config
 #
+  movie-list-match:
+    list_match:
+      from:
+        - movie_list: trakt-movies
+
   movies-3d:
     tmdb_lookup: yes
     movie_list: trakt-movies
@@ -72,7 +77,7 @@ templates:
       min: 1000
       max: 15000
     
-  movies-2160p:
+  movies-2160p-webdl:
     tmdb_lookup: yes
     movie_list: trakt-movies
     regexp:
@@ -85,8 +90,24 @@ templates:
     content_size:
       min: 2000
       max: 60000
+
+  movies-2160p-h264:
+    tmdb_lookup: yes
+    movie_list: trakt-movies
+    regexp:
+      accept:
+        - (2160p|4K|4k)
+      reject:
+        - (480|720|1080)
+      from: title
+    quality:  h264+
+    content_size:
+      min: 2000
+      max: 60000
       
   movies-1080p:
+    template:
+      - movie-list-match
     tmdb_lookup: yes
     movie_list: trakt-movies
     quality: 1080i+ hdtv+ h265
@@ -95,12 +116,28 @@ templates:
       max: 12000
 
   movies-720p:
+    template:
+      - movie-list-match
     tmdb_lookup: yes
     movie_list: trakt-movies
     quality: 720i+ hdtv+ 
     content_size:
       min: 250
       max: 5000
+      
+  trakt-movies-remove:
+    list_remove:
+      - movie_list: trakt-movies
+      - trakt_list:
+          account: '{{secrets.trakt.account}}'
+          list: '{{secrets.trakt.moviesqueue}}'
+          type: movies
+  trakt-movies-add:        
+    list_add:
+      - trakt_list:
+          account: '{{secrets.trakt.account}}'
+          list: '{{secrets.trakt.movieswatchlist}}'
+          type: movies      
 
 ##### Transmission config
 #
@@ -255,6 +292,44 @@ templates:
     tmdb_lookup: yes
     parsing:
       movie: guessit
+  
+
+  download-movies-discover-base:   
+    template:
+        - reject
+        - torrents
+        - transmission-movies
+        - pushbullet
+        - trakt-movies-remove
+        - trakt-movies-add
+    exists_movie:
+      - '/{{secrets.folder.root}}{{secrets.folder.downmovies}}'
+      - '/{{secrets.folder.root}}{{secrets.folder.movies}}'
+    discover:
+      release_estimations: loose
+      interval: 15 minutes
+      what:
+        - movie_list: trakt-movies
+      from:
+        - iptorrents: 
+            rss_key: '{{ secrets.iptorrents.rss_key }}' 
+            uid: 1486500 
+            password: '{{ secrets.iptorrents.password }}'
+            category:
+              - 87 #Movies 3D
+              - 48 #Movie HD
+              - 20 #Movie Web DL
+              - Movie-HD-Bluray
+              - Movie-MP4
+              - Movie-BD-Rip
+              - Movie-3D
+    
+    list_add:
+      - trakt_list:
+          account: '{{secrets.trakt.account}}'
+          list: '{{secrets.trakt.movieswatchlist}}'
+          type: movies
+          
 
 
 tasks:
@@ -487,18 +562,13 @@ tasks:
     template:
       - disable-seen-retry
       - movies-metainfo
+      - trakt-movies-remove
     filesystem:
       path: '/{{secrets.folder.root}}{{secrets.folder.movies}}'
       recursive: yes
       retrieve: files
       regexp: '.*\.(avi|mkv|mp4)$'
     accept_all: yes
-    list_remove:
-      - movie_list: trakt-movies
-      - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.movies}}'
-          type: movies
 
 
 ##### Fill the movie queue with movies from trakt list
@@ -507,7 +577,7 @@ tasks:
     priority: 23
     trakt_list:
       account: '{{secrets.trakt.account}}'
-      list: '{{secrets.trakt.movies}}'
+      list: '{{secrets.trakt.moviesqueue}}'
       type: movies
       strip_dates: yes
     accept_all: yes
@@ -524,6 +594,7 @@ tasks:
       - movies-metainfo
       - transmission-movies
       - pushbullet
+      - trakt-movies-remove
     filesystem:
       path: '/{{secrets.folder.root}}{{secrets.folder.downmovies}}'
       mask: '*.torrent'
@@ -531,82 +602,31 @@ tasks:
     exec:
       on_output:
         for_accepted: rm -f "{{location}}"
-    list_remove:
-      - movie_list: trakt-movies
-      - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.movies}}'
-          type: movies
           
+
 ##### Discover and download 3D movies
 #
   download-movies-3D-discover:
     priority: 24
     template:
+      - download-movies-discover-base
       - movies-3d
-      - reject
-      - torrents
-      - transmission-movies
-      - pushbullet
-    exists_movie:
-      - '/{{secrets.folder.root}}{{secrets.folder.downmovies}}'
-      - '/{{secrets.folder.root}}{{secrets.folder.movies}}'
-    discover:
-      release_estimations: loose
-      interval: 15 minutes
-      what:
-        - movie_list: trakt-movies
-      from:
-        - iptorrents: 
-            rss_key: '{{ secrets.iptorrents.rss_key }}' 
-            uid: 1486500 
-            password: '{{ secrets.iptorrents.password }}'
-            category:
-              - 87 #Movies 3D
-    list_match:
-      from:
-        - movie_list: trakt-movies
-    list_remove:
-      - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.movies}}'
-          type: movies
+    
 
 ##### Discover and download 2160p movies
 #
-  download-movies-2160p-discover:
+  download-movies-2160p-webdl-discover:
     priority: 25
     template:
-      - movies-2160p
-      - reject
-      - torrents
-      - transmission-movies
-      - pushbullet
-    exists_movie:
-      - '/{{secrets.folder.root}}{{secrets.folder.downmovies}}'
-      - '/{{secrets.folder.root}}{{secrets.folder.movies}}'
-    discover:
-      release_estimations: loose
-      interval: 15 minutes
-      what:
-        - movie_list: trakt-movies
-      from:
-        - iptorrents: 
-            rss_key: '{{ secrets.iptorrents.rss_key }}' 
-            uid: 1486500 
-            password: '{{ secrets.iptorrents.password }}'
-            category: 
-              - 48 #Movie HD
-              - 20 #Movie Web DL
-              - 87 #Movies 3D
-    list_match:
-      from:
-        - movie_list: trakt-movies
-    list_remove:
-      - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.movies}}'
-          type: movies
+      - download-movies-discover-base
+      - movies-2160p-webdl
+
+  download-movies-2160p-h264-discover:
+    priority: 25
+    template:
+      - download-movies-discover-base
+      - movies-2160p-h264
+
           
 
 ##### Discover and download 1080p movies
@@ -614,39 +634,9 @@ tasks:
   download-movies-1080p-discover:
     priority: 26
     template:
+      - download-movies-discover-base
       - movies-1080p
-      - reject
-      - torrents
-      - transmission-movies
-      - pushbullet
-    exists_movie:
-      - '/{{secrets.folder.root}}{{secrets.folder.downmovies}}'
-      - '/{{secrets.folder.root}}{{secrets.folder.movies}}'
-    discover:
-      release_estimations: loose
-      interval: 15 minutes
-      what:
-        - movie_list: trakt-movies
-      from:
-        - iptorrents: 
-            rss_key: '{{ secrets.iptorrents.rss_key }}' 
-            uid: 1486500 
-            password: '{{ secrets.iptorrents.password }}'
-            category: 
-              - Movie-HD-Bluray
-              - Movie-MP4
-              - Movie-BD-Rip
-              - Movie-3D 
-              - 48 #Movie HD
-              - 20 #Movie Web DL
-    list_match:
-      from:
-        - movie_list: trakt-movies
-    list_remove:
-      - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.movies}}'
-          type: movies
+
 
 
 ##### Discover and download 720p movies, if the movie is not recent
@@ -654,42 +644,9 @@ tasks:
   download-movies-720p-discover:
     priority: 27
     template:
+      - download-movies-discover-base
       - movies-720p
-      - reject
-      - torrents
-      - transmission-movies
-      - pushbullet
-    exists_movie:
-      - '/{{secrets.folder.root}}{{secrets.folder.downmovies}}'
-      - '/{{secrets.folder.root}}{{secrets.folder.movies}}'
-    discover:
-      release_estimations: loose
-      interval: 15 minutes
-      what:
-        - movie_list: trakt-movies
-      from:
-        - iptorrents: 
-            rss_key: '{{ secrets.iptorrents.rss_key }}' 
-            uid: 1486500 
-            password: '{{ secrets.iptorrents.password }}'
-            category: 
-              - Movie-HD-Bluray
-              - Movie-MP4
-              - Movie-BD-Rip
-              - Movie-3D 
-              - 48 #Movie HD
-              - 20 #Movie Web DL
 
-    if:
-      - tmdb_year > now.year - 1: reject
-    list_match:
-      from:
-        - movie_list: trakt-movies
-    list_remove:
-      - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.movies}}'
-          type: movies
 
 
 ##### Move series from downloads folder to respective folders, along with existing subtitles and adding the files to the subtitle queue
@@ -806,7 +763,6 @@ tasks:
       exact_match: yes
       languages:
         - eng
-
 
 ##### Clean finished torrents from transmission
 #
