@@ -33,9 +33,9 @@ templates:
       settings:
         identified_by: ep
         timeframe: 16 hours
-        target: hdtv+ 720p !10bit !h265
-        quality: webrip+ 720p !10bit !h265
-        propers: 16 hours
+        target: hdtv+ 1080p  h265
+        quality: webrip+ 720p 
+        propers: 12 hours
         specials: no
     content_size:
       min: 350
@@ -64,7 +64,7 @@ templates:
     #quality:  webdl+ 
     content_size:
       min: 1000
-      max: 60000
+      max: 15000
     regexp:
       accept:
         - (3D|3d)
@@ -75,7 +75,7 @@ templates:
   movies-2160p:
     tmdb_lookup: yes
     movie_list: trakt-movies
-    quality:  webdl+ 
+    #quality:  webdl+ 
     content_size:
       min: 2000
       max: 60000
@@ -90,7 +90,7 @@ templates:
     quality: 1080i+ hdtv+ 
     content_size:
       min: 500
-      max: 6000
+      max: 12000
 
   movies-720p:
     tmdb_lookup: yes
@@ -98,7 +98,7 @@ templates:
     quality: 720i+ hdtv+ 
     content_size:
       min: 250
-      max: 3000
+      max: 5000
 
 ##### Transmission config
 #
@@ -190,6 +190,7 @@ templates:
   transmission-series:
     transmission:
       <<: *transmission-settings
+      addpaused: yes
       main_file_only: yes
       include_subs: yes
       rename_like_files: yes
@@ -201,6 +202,7 @@ templates:
   transmission-anime:
     transmission:
       <<: *transmission-settings
+      addpaused: yes
       main_file_only: yes
       content_filename: "{{series_name}} - ep{{series_id}} - [{{quality}}]"
       path: "/{{secrets.folder.root}}{{secrets.folder.downanime}}{{series_name|pathscrub}}/"
@@ -210,6 +212,7 @@ templates:
   transmission-movies:
     transmission:
       <<: *transmission-settings
+      addpaused: yes
       main_file_only: yes
       include_subs: yes
       rename_like_files: yes
