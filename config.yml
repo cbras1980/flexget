@@ -1,9 +1,16 @@
 secrets: secrets.yml
+
+web_server:
+  bind: 0.0.0.0
+  port: 5050
+api: yes
+webui: yes
+
 schedules:
   - tasks: ['populate-*', 'clean-*', 'update-*']
     schedule:
       hour: 0
-  - tasks: ['purge-*', 'fill-*', '*-rss', '*-magnets']
+  - tasks: ['purge-*', 'fill-*'] # , '*-rss', '*-magnets'
     schedule:
       minute: 0,30
   - tasks: ['*-discover', '*-manual']
@@ -19,7 +26,7 @@ templates:
 #
   series:
     thetvdb_lookup: yes
-    include: series.yml
+#    include: series.yml
     configure_series:
       from:
         entry_list: trakt-series
@@ -39,13 +46,13 @@ templates:
 ##### Anime config
 #
   anime:
-    include: anime.yml
+#    include: anime.yml
     configure_series:
       from:
         entry_list: myanimelist-series
       settings:
         identified_by: sequence
-        quality: 720p !10bit !h265
+        quality: 720p 
         special_ids:
           - OVA
 
@@ -54,17 +61,17 @@ templates:
   movies-1080p:
     tmdb_lookup: yes
     movie_list: trakt-movies
-    quality: 1080p webdl+ !10bit !h265
+    quality: 1080p webdl+ 
     content_size:
-      min: 1000
+      min: 500
       max: 6000
 
   movies-720p:
     tmdb_lookup: yes
     movie_list: trakt-movies
-    quality: 720p webdl+ !10bit !h265
+    quality: 720p webdl+ 
     content_size:
-      min: 500
+      min: 250
       max: 3000
 
 ##### Transmission config
@@ -287,19 +294,19 @@ tasks:
 
 ##### Fetch, format and output myanimelist series list to a custom entry list
 #
-  fill-anime-series-list:
-    priority: 8
-    template:
-      - disable-seen-retry
-      - series-metainfo
-    myanimelist:
-      user_id: '{{secrets.myanimelist.id}}'
-      list: both
-    accept_all: yes
-    set:
-      title: "{{myanimelist_name|re_replace('[-/:;.★](?=[a-zA-Z])', ' ')|re_replace('[:;](?![a-zA-Z])|[`´()]|TV|', '')|re_replace('Season ', 'S')|re_replace('  +', ' ')}}"
-    list_add:
-      - entry_list: myanimelist-series
+#  fill-anime-series-list:
+#    priority: 8
+#    template:
+#      - disable-seen-retry
+#      - series-metainfo
+#    myanimelist:
+#      user_id: '{{secrets.myanimelist.id}}'
+#      list: both
+#    accept_all: yes
+#    set:
+#      title: "{{myanimelist_name|re_replace('[-/:;.★](?=[a-zA-Z])', ' ')|re_replace('[:;](?![a-zA-Z])|[`´()]|TV|', '')|re_replace('Season ', 'S')|re_replace('  +', ' ')}}"
+#    list_add:
+#      - entry_list: myanimelist-series
 
 
 ##### Download episodes from manually downloaded torrents
@@ -323,36 +330,36 @@ tasks:
 
 ##### Download episodes from RSS feeds
 #
-  download-series-rss:
-    priority: 12
-    template:
-      - series
-      - reject
-      - torrents
-      - transmission-series
-      - pushbullet
-    inputs:
-      - rss: https://eztv.unblocked.live/ezrss.xml
-      - rss: https://extratorrent.cc/rss.xml?cid=8&type=last
-      - rss: https://www.torrentfunk.com/tv/rss.xml
+#  download-series-rss:
+#    priority: 12
+#    template:
+#      - series
+#      - reject
+#      - torrents
+#      - transmission-series
+#      - pushbullet
+#    inputs:
+#      - rss: https://eztv.unblocked.live/ezrss.xml
+#      - rss: https://extratorrent.cc/rss.xml?cid=8&type=last
+#      - rss: https://www.torrentfunk.com/tv/rss.xml
 
 
 ##### Download episodes from RSS magnets feeds, as a fallback from the previous task
 #
-  download-series-magnets:
-    priority: 13
-    template:
-      - series
-      - reject
-      - torrents
-      - transmission-series
-      - pushbullet
-    magnets: yes
-    convert_magnet: yes
-    inputs:
-      - rss:
-          url: http://showrss.info/feeds/all.rss
-          all_entries: yes
+#  download-series-magnets:
+#    priority: 13
+#    template:
+#      - series
+#      - reject
+#      - torrents
+#      - transmission-series
+#      - pushbullet
+#    magnets: yes
+#    convert_magnet: yes
+#    inputs:
+#      - rss:
+#          url: http://showrss.info/feeds/all.rss
+#          all_entries: yes
 
 
 ##### Discover and download older episodes and pilots from recently added series
@@ -372,9 +379,17 @@ tasks:
         - next_series_episodes:
             from_start: yes
       from:
-        - piratebay:
-            category: highres tv
-
+        - iptorrents: 
+            rss_key: '{{ secrets.iptorrents.rss_key }}'
+            uid: 1486500 
+            password: '{{ secrets.iptorrents.password }}'
+            category: 
+              - TV-480p 
+              - TV-SD-x264
+              - TV-Web-DL
+              - TV-x264  
+              - 99 #TV-x265
+              - TV-MP4
 
 ##### Download anime from manually downloaded torrents
 #
@@ -396,17 +411,17 @@ tasks:
 
 ##### Download anime from RSS feed
 #
-  download-anime-rss:
-    priority: 16
-    template:
-      - anime
-      - torrents
-      - transmission-anime
-      - pushbullet
-    inputs:
-      - rss:
-          url: http://www.nyaa.se/?page=rss&cats=1_37
-          all_entries: yes
+#  download-anime-rss:
+#    priority: 16
+#    template:
+#      - anime
+#      - torrents
+#      - transmission-anime
+#      - pushbullet
+#    inputs:
+#      - rss:
+#          url: http://www.nyaa.se/?page=rss&cats=1_37
+#          all_entries: yes
 
 
 ##### Discover and download anime
@@ -426,9 +441,12 @@ tasks:
             from_start: yes
             backfill: yes
       from:
-        - nyaa:
-            category: anime eng
-            filter: all
+        - iptorrents: 
+            rss_key: '{{ secrets.iptorrents.rss_key }}'
+            uid: 1486500 
+            password: '{{ secrets.iptorrents.password }}'
+            category: 
+              - 60
 
 
 ##### Remove manually downloaded movies from the movie queue and trakt list
@@ -509,10 +527,17 @@ tasks:
       what:
         - movie_list: trakt-movies
       from:
-        - piratebay:
-            category: highres movies
-        - extratorrent:
-            category: movies
+        - iptorrents: 
+            rss_key: '{{ secrets.iptorrents.rss_key }}' 
+            uid: 1486500 
+            password: '{{ secrets.iptorrents.password }}'
+            category: 
+              #- Movie-HD-Bluray
+              #- Movie-MP4
+              #- Movie-BD-Rip
+              #- Movie-3D 
+              - 48 #Movie HD
+              #- 20 #Movie Web DL
     list_match:
       from:
         - movie_list: trakt-movies
@@ -542,10 +567,18 @@ tasks:
       what:
         - movie_list: trakt-movies
       from:
-        - piratebay:
-            category: highres movies
-        - extratorrent:
-            category: movies
+        - iptorrents: 
+            rss_key: '{{ secrets.iptorrents.rss_key }}' 
+            uid: 1486500 
+            password: '{{ secrets.iptorrents.password }}'
+            category: 
+              #- Movie-HD-Bluray
+              #- Movie-MP4
+              #- Movie-BD-Rip
+              #- Movie-3D 
+              - 48 #Movie HD
+              #- 20 #Movie Web DL
+
     if:
       - tmdb_year > now.year - 1: reject
     list_match:
@@ -681,7 +714,7 @@ tasks:
     disable: details
     clean_transmission:
       <<: *transmission-settings
-      finished_for: 1 day
+      finished_for: 15 day
 
 
 ##### Update trakt series list from local series folders, excluding the ones that already ended
