@@ -31,8 +31,8 @@ templates:
       settings:
 #        identified_by: ep
         timeframe: 12 hours
-        target:  1080p  h265
-        quality: 480p+ 
+        target: hdtv+ 1080p  h265
+        quality: webrip+ 480p 
         propers: 12 hours
         specials: no
     content_size:
