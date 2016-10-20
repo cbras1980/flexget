@@ -3,8 +3,8 @@ secrets: secrets.yml
 web_server:
   bind: 0.0.0.0
   port: 5050
-api: yes
-webui: yes
+#api: yes
+#webui: yes
 
 schedules:
   - tasks: ['populate-*', 'clean-*', 'update-*']
@@ -205,7 +205,7 @@ templates:
   transmission-series:
     transmission:
       <<: *transmission-settings
-      addpaused: yes
+      addpaused: no 
       main_file_only: yes
       include_subs: yes
       rename_like_files: yes
@@ -216,7 +216,7 @@ templates:
   transmission-movies:
     transmission:
       <<: *transmission-settings
-      addpaused: yes
+      addpaused: no 
       main_file_only: yes
       include_subs: yes
       rename_like_files: yes
