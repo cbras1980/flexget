@@ -12,3 +12,5 @@ converted/
 *test*
 trakt*
 anidb*
+*.bak
+cached_resources
