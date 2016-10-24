@@ -206,7 +206,7 @@ templates:
     transmission:
       <<: *transmission-settings
       addpaused: no 
-      main_file_only: yes
+#      main_file_only: yes
       include_subs: yes
       rename_like_files: yes
       content_filename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
@@ -217,7 +217,7 @@ templates:
     transmission:
       <<: *transmission-settings
       addpaused: no 
-      main_file_only: yes
+#      main_file_only: yes
       include_subs: yes
       rename_like_files: yes
       content_filename: "{{tmdb_name|pathscrub}} ({{tmdb_year}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
