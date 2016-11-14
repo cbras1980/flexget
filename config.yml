@@ -32,7 +32,7 @@ templates:
         target:  1080p  h265
         quality: 480p+ 
         propers: 12 hours
-        specials: no
+#        specials: no
     content_size:
       min: 200
       max: 1400
@@ -218,8 +218,8 @@ templates:
     transmission:
       <<: *transmission-settings
       addpaused: no 
-#      main_file_only: yes
-      include_subs: yes
+      main_file_only: no
+#      include_subs: yes
       rename_like_files: yes
       content_filename: "{{tmdb_name|pathscrub}} ({{tmdb_year}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       path: "/{{secrets.folder.root}}{{secrets.folder.movies}}{{movie_name|pathscrub}}"
