@@ -27,14 +27,11 @@ templates:
       from:
         entry_list: trakt-series
       settings:
-#        identified_by: ep
         timeframe: 12 hours
         target:  1080p  h265
-        quality: 480p+ 
-        propers: 12 hours
-#        specials: no
+        propers: 24 hours
     content_size:
-      min: 200
+      min: 150
       max: 1400
     content_filter:
       require:
@@ -225,11 +222,11 @@ templates:
       path: "/{{secrets.folder.root}}{{secrets.folder.movies}}{{movie_name|pathscrub}}"
 
 ##### Pushbullet config
-  pushbullet:
-    pushbullet:
-      apikey: '{{secrets.pushbullet.api}}'
-      title: "[flexget] {{task}}"
-      body: "{{title}}"
+#  pushbullet:
+#    pushbullet:
+#      apikey: '{{secrets.pushbullet.api}}'
+#      title: "[flexget] {{task}}"
+#      body: "{{title}}"
 
 ##### Disable builtins for some tasks
   disable-seen-retry:
@@ -260,7 +257,7 @@ templates:
         - reject
         - torrents
         - transmission-movies
-        - pushbullet
+          # - pushbullet
         - trakt-movies-remove
         - trakt-movies-add
     exists_movie:
@@ -350,7 +347,7 @@ tasks:
       - series-metainfo
       - series-guessit
       - transmission-series
-      - pushbullet
+        #- pushbullet
     filesystem:
       path: '/{{secrets.folder.root}}{{secrets.folder.series}}'
       mask: '*.torrent'
@@ -369,7 +366,7 @@ tasks:
       - reject
       - torrents
       - transmission-series
-      - pushbullet
+     # - pushbullet
     discover:
       release_estimations: ignore
       interval: 15 minutes
@@ -425,7 +422,7 @@ tasks:
       - disable-seen-retry
       - movies-metainfo
       - transmission-movies
-      - pushbullet
+        # - pushbullet
       - trakt-movies-remove
     filesystem:
       path: '/{{secrets.folder.root}}{{secrets.folder.movies}}'
@@ -515,7 +512,7 @@ tasks:
     template:
       - disable-seen-retry
       - series-metainfo
-      - pushbullet
+        # - pushbullet
     trakt_list:
       account: '{{secrets.trakt.account}}'
       list: '{{secrets.trakt.series}}'
