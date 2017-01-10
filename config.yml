@@ -1,4 +1,4 @@
-secrets: secrets.yml
+variables: secrets.yml
 
 web_server: yes
 #web_server:
@@ -111,23 +111,23 @@ templates:
     list_remove:
       - movie_list: trakt-movies
       - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.moviesqueue}}'
+          account: '{? trakt.account ?}'
+          list: '{? trakt.moviesqueue ?}'
           type: movies
   trakt-movies-add:        
     list_add:
       - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.movieswatchlist}}'
+          account: '{? trakt.account ?}'
+          list: '{? trakt.movieswatchlist ?}'
           type: movies      
 
 ##### Transmission config
   transmission-anchors:
     _transmission-settings: &transmission-settings
-      host: '{{secrets.transmission.host}}'
+      host: '{? transmission.host ?}'
       port: 9091
-      username: '{{secrets.transmission.user}}'
-      password: '{{secrets.transmission.pass}}'
+      username: '{? transmission.user ?}'
+      password: '{? transmission.pass ?}'
 
 ##### Common rejections
   reject:
@@ -154,7 +154,7 @@ templates:
     no_entries_ok: yes
     pathscrub: windows
     free_space:
-      path: '/{{secrets.folder.root}}'
+      path: '/{? folder.root ?}'
       space: 5000
     # Requires log_filter plugin
     log_filter:
@@ -208,7 +208,7 @@ templates:
       include_subs: yes
       rename_like_files: yes
       content_filename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
-      path: "/{{secrets.folder.root}}{{secrets.folder.series}}{{tvdb_series_name|default(series_name)|pathscrub}}/"
+      path: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|default(series_name)|pathscrub}}/"
 
 ##### Transmission movies config
   transmission-movies:
@@ -219,7 +219,7 @@ templates:
 #      include_subs: yes
       rename_like_files: yes
       content_filename: "{{tmdb_name|pathscrub}} ({{tmdb_year}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
-      path: "/{{secrets.folder.root}}{{secrets.folder.movies}}{{movie_name|pathscrub}}"
+      path: "/{? folder.root ?}{? folder.movies ?}{{movie_name|pathscrub}}"
 
 ##### Pushbullet config
 #  pushbullet:
@@ -261,7 +261,7 @@ templates:
         - trakt-movies-remove
         - trakt-movies-add
     exists_movie:
-      - '/{{secrets.folder.root}}{{secrets.folder.movies}}'
+      - '/{? folder.root ?}{? folder.movies ?}'
     discover:
       release_estimations: loose
       interval: 15 minutes
@@ -269,9 +269,9 @@ templates:
         - movie_list: trakt-movies
       from:
         - iptorrents: 
-            rss_key: '{{ secrets.iptorrents.rss_key }}' 
+            rss_key: '{? iptorrents.rss_key ?}' 
             uid: 1486500 
-            password: '{{ secrets.iptorrents.password }}'
+            password: '{? iptorrents.password ?}'
             category:
               - 87 #Movies 3D
               - 48 #Movie HD
@@ -282,8 +282,8 @@ templates:
               - Movie-3D
     list_add:
       - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.movieswatchlist}}'
+          account: '{? trakt.account ?}'
+          list: '{? trakt.movieswatchlist ?}'
           type: movies
           
 
@@ -297,7 +297,7 @@ tasks:
       - series-metainfo
     seen: local
     filesystem:
-      path: '/{{secrets.folder.root}}{{secrets.folder.series}}'
+      path: '/{? folder.root ?}{? folder.series ?}'
       recursive: yes
       retrieve: files
       regexp: '.*\.(avi|mkv|mp4)$'
@@ -305,7 +305,7 @@ tasks:
     configure_series:
       from:
         filesystem:
-          path: '/{{secrets.folder.root}}{{secrets.folder.series}}'
+          path: '/{? folder.root ?}{? folder.series ?}'
           retrieve: dirs
       settings:
         tracking: no
@@ -329,12 +329,12 @@ tasks:
       - disable-seen-retry
       - series-metainfo
     trakt_list:
-      account: '{{secrets.trakt.account}}'
-      list: '{{secrets.trakt.series}}'
+      account: '{? trakt.account ?}'
+      list: '{? trakt.series ?}'
       type: shows
     accept_all: yes
     set:
-      title: "{{tvdb_series_name|escape|replace('&#39;', '')}}"
+      title: "{{ tvdb_series_name|escape|replace('&#39;', '') }}"
     list_add:
       - entry_list: trakt-series
 
@@ -349,7 +349,7 @@ tasks:
       - transmission-series
         #- pushbullet
     filesystem:
-      path: '/{{secrets.folder.root}}{{secrets.folder.series}}'
+      path: '/{? folder.root ?}{? folder.series ?}'
       mask: '*.torrent'
     accept_all: yes
     exec:
@@ -375,9 +375,9 @@ tasks:
             from_start: yes
       from:
         - iptorrents: 
-            rss_key: '{{ secrets.iptorrents.rss_key }}'
+            rss_key: '{? iptorrents.rss_key ?}'
             uid: 1486500 
-            password: '{{ secrets.iptorrents.password }}'
+            password: '{? iptorrents.password ?}'
             category: 
               - TV-480p 
               - TV-SD-x264
@@ -395,7 +395,7 @@ tasks:
       - movies-metainfo
       - trakt-movies-remove
     filesystem:
-      path: '/{{secrets.folder.root}}{{secrets.folder.movies}}'
+      path: '/{? folder.root ?}{? folder.movies ?}'
       recursive: yes
       retrieve: files
       regexp: '.*\.(avi|mkv|mp4)$'
@@ -406,8 +406,8 @@ tasks:
   fill-movie-queue:
     priority: 23
     trakt_list:
-      account: '{{secrets.trakt.account}}'
-      list: '{{secrets.trakt.moviesqueue}}'
+      account: '{? trakt.account ?}'
+      list: '{? trakt.moviesqueue ?}'
       type: movies
       strip_dates: yes
     accept_all: yes
@@ -425,7 +425,7 @@ tasks:
         # - pushbullet
       - trakt-movies-remove
     filesystem:
-      path: '/{{secrets.folder.root}}{{secrets.folder.movies}}'
+      path: '/{? folder.root ?}{? folder.movies ?}'
       mask: '*.torrent'
     accept_all: yes
     exec:
@@ -488,7 +488,7 @@ tasks:
       - disable-seen-retry
       - series-metainfo
     filesystem:
-      path: '/{{secrets.folder.root}}{{secrets.folder.series}}'
+      path: '/{? folder.root ?}{? folder.series ?}'
       retrieve: dirs
     manipulate:
       - title:
@@ -500,8 +500,8 @@ tasks:
       - tvdb_status == 'Ended': reject
     list_add:
       - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.series}}'
+          account: '{? trakt.account ?}'
+          list: '{? trakt.series ?}'
           type: shows
 
 
@@ -514,14 +514,14 @@ tasks:
       - series-metainfo
         # - pushbullet
     trakt_list:
-      account: '{{secrets.trakt.account}}'
-      list: '{{secrets.trakt.series}}'
+      account: '{? trakt.account ?}'
+      list: '{? trakt.series ?}'
       type: shows
     if:
       - tvdb_status == 'Ended': accept
     list_remove:
       - trakt_list:
-          account: '{{secrets.trakt.account}}'
-          list: '{{secrets.trakt.series}}'
+          account: '{? trakt.account ?}'
+          list: '{? trakt.series ?}'
           type: shows
 
