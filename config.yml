@@ -222,7 +222,12 @@ templates:
       path: "/{? folder.root ?}{? folder.movies ?}{{movie_name|pathscrub}}"
 
 ##### Pushbullet config
-#  pushbullet:
+  pushbullet:
+    notify:
+      entries:
+        via:
+          - pushbullet:
+              api_key: '{? pushbullet.api ?}'
 #    pushbullet:
 #      apikey: '{{secrets.pushbullet.api}}'
 #      title: "[flexget] {{task}}"
@@ -257,7 +262,7 @@ templates:
         - reject
         - torrents
         - transmission-movies
-          # - pushbullet
+        - pushbullet
         - trakt-movies-remove
         - trakt-movies-add
     exists_movie:
@@ -347,7 +352,7 @@ tasks:
       - series-metainfo
       - series-guessit
       - transmission-series
-        #- pushbullet
+      - pushbullet
     filesystem:
       path: '/{? folder.root ?}{? folder.series ?}'
       mask: '*.torrent'
@@ -366,7 +371,7 @@ tasks:
       - reject
       - torrents
       - transmission-series
-     # - pushbullet
+      - pushbullet
     discover:
       release_estimations: ignore
       interval: 15 minutes
@@ -422,7 +427,7 @@ tasks:
       - disable-seen-retry
       - movies-metainfo
       - transmission-movies
-        # - pushbullet
+      - pushbullet
       - trakt-movies-remove
     filesystem:
       path: '/{? folder.root ?}{? folder.movies ?}'
@@ -512,7 +517,7 @@ tasks:
     template:
       - disable-seen-retry
       - series-metainfo
-        # - pushbullet
+      - pushbullet
     trakt_list:
       account: '{? trakt.account ?}'
       list: '{? trakt.series ?}'
