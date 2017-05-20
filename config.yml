@@ -207,7 +207,8 @@ templates:
 #      main_file_only: yes
       include_subs: yes
       rename_like_files: yes
-      content_filename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      content_filename: "{% if tvdb_episode|default(False) and tvdb_ep_name|default(False) %}{{tvdb_series_name|pathscrub|re_replace(' \\([0-9]*\\)','')}} {{tvdb_season}}x{{tvdb_episode|pad(2)}} - {{tvdb_ep_name|pathscrub}}{% else %}{{title}}{% endif %}"  
+#      content_filename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       path: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|default(series_name)|pathscrub}}/"
 
 ##### Transmission movies config
