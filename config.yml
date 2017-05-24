@@ -10,13 +10,13 @@ web_server: yes
 schedules:
   - tasks: ['populate-*', 'clean-*', 'update-*']
     schedule:
-      hour: 0
+      minute: 0,30
   - tasks: ['purge-*', 'fill-*'] # , '*-rss', '*-magnets'
     schedule:
       minute: 0,30
   - tasks: ['*-discover', '*-manual']
     schedule:
-      hour: '*/2'
+      minute: 0,15,30,45
 
 templates:
 
@@ -28,8 +28,9 @@ templates:
         entry_list: trakt-series
       settings:
         timeframe: 12 hours
-        target:  1080p  h265
+        target:  1080p h265
         propers: 24 hours
+        identified_by: ep
     content_size:
       min: 150
       max: 1400
@@ -39,7 +40,6 @@ templates:
 
 
 ##### Movies config
-#
   movie-list-match:
     list_match:
       from:
@@ -243,6 +243,8 @@ templates:
 
 ##### Series metainfo mainly for move and update tasks
   series-metainfo:
+    trakt_lookup: yes
+    imdb_lookup: yes
     metainfo_series: yes
     thetvdb_lookup: yes
 
@@ -286,11 +288,11 @@ templates:
               - Movie-MP4
               - Movie-BD-Rip
               - Movie-3D
-    list_add:
-      - trakt_list:
-          account: '{? trakt.account ?}'
-          list: '{? trakt.movieswatchlist ?}'
-          type: movies
+#    list_add:
+#      - trakt_list:
+#          account: '{? trakt.account ?}'
+#          list: '{? trakt.movieswatchlist ?}'
+#          type: movies
           
 
 
@@ -375,10 +377,9 @@ tasks:
       - pushbullet
     discover:
       release_estimations: ignore
-      interval: 15 minutes
+      interval: 5 minutes
       what:
-        - next_series_episodes:
-            from_start: yes
+        - next_series_episodes: yes
       from:
         - iptorrents: 
             rss_key: '{? iptorrents.rss_key ?}'
