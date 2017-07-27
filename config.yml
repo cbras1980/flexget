@@ -28,7 +28,7 @@ templates:
         entry_list: trakt-series
       settings:
         timeframe: 12 hours
-        target:  1080p h265
+        target:  1080p+ h265
         propers: 24 hours
         identified_by: ep
     content_size:
