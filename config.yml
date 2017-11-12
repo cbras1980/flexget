@@ -33,7 +33,7 @@ templates:
         identified_by: ep
     content_size:
       min: 150
-      max: 1400
+      max: 2400
     content_filter:
       require:
         - '*.mkv'
@@ -51,7 +51,7 @@ templates:
     quality:  1080p+ webdl+ 
     content_size:
       min: 1000
-      max: 15000
+      max: 25000
     regexp:
       accept:
         - (3D|3d)
@@ -95,7 +95,7 @@ templates:
     quality: 1080i+ hdtv+ h265
     content_size:
       min: 500
-      max: 12000
+      max: 18000
 
   movies-720p:
     template:
@@ -229,10 +229,7 @@ templates:
         via:
           - pushbullet:
               api_key: '{? pushbullet.api ?}'
-#    pushbullet:
-#      apikey: '{{secrets.pushbullet.api}}'
-#      title: "[flexget] {{task}}"
-#      body: "{{title}}"
+              channel: '{? pushbullet.channel ?}'
 
 ##### Disable builtins for some tasks
   disable-seen-retry:
