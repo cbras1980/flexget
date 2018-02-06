@@ -1,11 +1,6 @@
 variables: secrets.yml
 
 web_server: yes
-#web_server:
-#  bind: 0.0.0.0
-#  port: 5050
-#api: yes
-#webui: yes
 
 schedules:
   - tasks: ['populate-*', 'clean-*', 'update-*']
@@ -33,7 +28,7 @@ templates:
         identified_by: ep
     content_size:
       min: 150
-      max: 2400
+      max: 3600
     content_filter:
       require:
         - '*.mkv'
@@ -338,8 +333,9 @@ tasks:
       list: '{? trakt.series ?}'
       type: shows
     accept_all: yes
+    thetvdb_lookup: yes
     set:
-      title: "{{ tvdb_series_name|escape|replace('&#39;', '') }}"
+      title: "{{ series_name|escape|replace('&#39;', '') }}"
     list_add:
       - entry_list: trakt-series
 
@@ -477,12 +473,12 @@ tasks:
       - movies-720p
 
 ##### Clean finished torrents from transmission
-  clean-transmission:
-    priority: 37
-    disable: details
-    clean_transmission:
-      <<: *transmission-settings
-      finished_for: 18 day
+#  clean-transmission:
+#    priority: 37
+#    disable: details
+#    clean_transmission:
+#      <<: *transmission-settings
+#      finished_for: 30 day
 
 
 ##### Update trakt series list from local series folders, excluding the ones that already ended
