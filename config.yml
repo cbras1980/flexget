@@ -453,7 +453,7 @@ tasks:
 
 ##### Discover and download older episodes and pilots from recently added series
   download-movies-rss: # task
-    priority: 2
+    priority: 25
     template:
       - download-movies-discover-base
       - movies-2160p-h264
