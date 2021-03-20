@@ -212,12 +212,19 @@ templates:
     verify_ssl_certificates: no
     domain_delay:
       iptorrents.eu: 1 seconds
+      torrentgalaxy.to: 1 seconds
+      eztv.it: 1 seconds
+      showrss.info: 1 seconds
+      www.limetorrents.cc: 1 seconds
+      pirateproxy.ch: 1 seconds
+      extratorrent.cc: 1 seconds
+      www.torrentfunk.com: 1 seconds
 
 ##### Transmission series config
   transmission-series:
     transmission:
       <<: *transmission-settings
-      addpaused: no 
+#      addpaused: no 
 #      main_file_only: yes
       include_subs: yes
       rename_like_files: yes
@@ -229,7 +236,7 @@ templates:
   transmission-movies:
     transmission:
       <<: *transmission-settings
-      addpaused: no 
+#      addpaused: no 
       main_file_only: no
 #      include_subs: yes
       rename_like_files: yes
@@ -261,7 +268,6 @@ templates:
     parsing:
       movie: guessit
   
-
   download-movies-discover-base:   
     template:
         - reject
@@ -287,13 +293,6 @@ templates:
         - rarbg:
             category: [14, 17, 44, 45, 48]
         - yts: true
-#    list_add:
-#      - trakt_list:
-#          account: '{? trakt.account ?}'
-#          list: '{? trakt.movieswatchlist ?}'
-#          type: movies
-          
-
 
 tasks:
 
@@ -336,7 +335,6 @@ tasks:
       - disable-seen-retry
       - series-metainfo
     trakt_list:
-      account: '{? trakt.account ?}'
       list: '{? trakt.series ?}'
       type: shows
     accept_all: yes
@@ -409,7 +407,6 @@ tasks:
   fill-movie-queue:
     priority: 23
     trakt_list:
-      account: '{? trakt.account ?}'
       list: '{? trakt.moviesqueue ?}'
       type: movies
       strip_dates: yes
@@ -485,45 +482,45 @@ tasks:
 
 
 ##### Update trakt series list from local series folders, excluding the ones that already ended
-  update-series-list:
-    priority: 41
-    template:
-      - disable-seen-retry
-      - series-metainfo
-    filesystem:
-      path: '/{? folder.root ?}{? folder.series ?}'
-      retrieve: dirs
-    manipulate:
-      - title:
-          replace:
-            regexp: '$'
-            format: ' S01E01'
-    accept_all: yes
-    if:
-      - tvdb_status == 'Ended': reject
-    list_add:
-      - trakt_list:
-          account: '{? trakt.account ?}'
-          list: '{? trakt.series ?}'
-          type: shows
+#  update-series-list:
+#    priority: 41
+#    template:
+#      - disable-seen-retry
+#      - series-metainfo
+#    filesystem:
+#      path: '/{? folder.root ?}{? folder.series ?}'
+#      retrieve: dirs
+#    manipulate:
+#      - title:
+#          replace:
+#            regexp: '$'
+#            format: ' S01E01'
+#    accept_all: yes
+#    if:
+#      - tvdb_status == 'Ended': reject
+#    list_add:
+#      - trakt_list:
+#          account: '{? trakt.account ?}'
+#          list: '{? trakt.series ?}'
+#          type: shows
 
 
 ##### Clean the series that already ended from trakt series list
-  clean-series-list:
-    priority: 43
-    delay: 8 day
-    template:
-      - disable-seen-retry
-      - series-metainfo
-    trakt_list:
-      account: '{? trakt.account ?}'
-      list: '{? trakt.series ?}'
-      type: shows
-    if:
-      - tvdb_status == 'Ended': accept
-    list_remove:
-      - trakt_list:
-          account: '{? trakt.account ?}'
-          list: '{? trakt.series ?}'
-          type: shows
+#  clean-series-list:
+#    priority: 43
+#    delay: 8 day
+#    template:
+#      - disable-seen-retry
+#      - series-metainfo
+#    trakt_list:
+#      account: '{? trakt.account ?}'
+#      list: '{? trakt.series ?}'
+#      type: shows
+#    if:
+#      - tvdb_status == 'Ended': accept
+#    list_remove:
+#      - trakt_list:
+#          account: '{? trakt.account ?}'
+#          list: '{? trakt.series ?}'
+#          type: shows
 
