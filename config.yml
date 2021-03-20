@@ -33,7 +33,6 @@ templates:
       require:
         - '*.mkv'
 
-
 ##### Movies config
   movie-list-match:
     list_match:
@@ -52,7 +51,6 @@ templates:
         - (3D|3d)
       reject:
         - (2D|2d)
-
       
   movies-2160p-webdl:
     tmdb_lookup: yes
@@ -106,13 +104,12 @@ templates:
     list_remove:
       - movie_list: trakt-movies
       - trakt_list:
-          account: '{? trakt.account ?}'
           list: '{? trakt.moviesqueue ?}'
           type: movies
+
   trakt-movies-add:        
     list_add:
       - trakt_list:
-          account: '{? trakt.account ?}'
           list: '{? trakt.movieswatchlist ?}'
           type: movies      
 
@@ -120,9 +117,7 @@ templates:
   transmission-anchors:
     _transmission-settings: &transmission-settings
       host: '{? transmission.host ?}'
-      port: 9091
-      username: '{? transmission.user ?}'
-      password: '{? transmission.pass ?}'
+      port: '{? transmission.port ?}'
 
 ##### Common rejections
   reject:
@@ -140,7 +135,6 @@ templates:
       reject:
         - '*.rar'
         - '*.zip'
-
 
 ##### ADVANCED SETTINGS #####
 
@@ -216,15 +210,6 @@ templates:
       rename_like_files: yes
       content_filename: "{{tmdb_name|pathscrub}} ({{tmdb_year}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       path: "/{? folder.root ?}{? folder.movies ?}{{movie_name|pathscrub}}"
-
-##### Pushbullet config
-  pushbullet:
-    notify:
-      entries:
-        via:
-          - pushbullet:
-              api_key: '{? pushbullet.api ?}'
-              channel: '{? pushbullet.channel ?}'
 
 ##### Disable builtins for some tasks
   disable-seen-retry:
