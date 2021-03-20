@@ -557,3 +557,28 @@ tasks:
           list: '{? trakt.series ?}'
           type: shows
 
+##### Download subtitles task
+  subtitles-discover:
+    priority: 50
+    template: 
+      - disable-seen-retry
+    filesystem:
+      path:
+        - /data
+      regexp: '.*\.(avi|mkv|mp4)$'  # only include filenames with these extensions
+      recursive: yes
+    accept_all: yes
+    subliminal:
+      exact_match: no
+      providers: 
+        - opensubtitles
+        - tvsubtitles
+      languages:
+        - eng
+      alternatives:
+        - por
+      authentication:               #consider using the variables plugin
+        opensubtitles:
+          username: xonner
+          password: 8vvprx53
+
