@@ -286,10 +286,10 @@ templates:
       what:
         - movie_list: trakt-movies
       from:
-        - piratebay:
-            category: highres movies
-            sort_by: seeds
- #           url: https://thehiddenbay.com/
+#        - piratebay:
+#            category: highres movies
+#            sort_by: seeds
+#            url: https://thehiddenbay.com/
         - limetorrents:
             category: movies
         - rarbg:
@@ -382,9 +382,9 @@ tasks:
       what:
         - next_series_episodes: yes
       from:
-        - piratebay:
-            category: highres tv
-            sort_by: leechers
+#        - piratebay:
+#            category: highres tv
+#            sort_by: leechers
 #            url: https://pirateproxy.ch/
         - limetorrents:
             category: tv
