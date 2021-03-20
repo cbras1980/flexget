@@ -107,12 +107,14 @@ templates:
     list_remove:
       - movie_list: trakt-movies
       - trakt_list:
+          account: '{? trakt.account ?}'
           list: '{? trakt.moviesqueue ?}'
           type: movies
 
   trakt-movies-add:        
     list_add:
       - trakt_list:
+          account: '{? trakt.account ?}'
           list: '{? trakt.movieswatchlist ?}'
           type: movies      
 
@@ -335,6 +337,7 @@ tasks:
       - disable-seen-retry
       - series-metainfo
     trakt_list:
+      account: '{? trakt.account ?}'
       list: '{? trakt.series ?}'
       type: shows
     accept_all: yes
@@ -407,6 +410,7 @@ tasks:
   fill-movie-queue:
     priority: 23
     trakt_list:
+      account: '{? trakt.account ?}'
       list: '{? trakt.moviesqueue ?}'
       type: movies
       strip_dates: yes
@@ -482,45 +486,45 @@ tasks:
 
 
 ##### Update trakt series list from local series folders, excluding the ones that already ended
-#  update-series-list:
-#    priority: 41
-#    template:
-#      - disable-seen-retry
-#      - series-metainfo
-#    filesystem:
-#      path: '/{? folder.root ?}{? folder.series ?}'
-#      retrieve: dirs
-#    manipulate:
-#      - title:
-#          replace:
-#            regexp: '$'
-#            format: ' S01E01'
-#    accept_all: yes
-#    if:
-#      - tvdb_status == 'Ended': reject
-#    list_add:
-#      - trakt_list:
-#          account: '{? trakt.account ?}'
-#          list: '{? trakt.series ?}'
-#          type: shows
+  update-series-list:
+    priority: 41
+    template:
+      - disable-seen-retry
+      - series-metainfo
+    filesystem:
+      path: '/{? folder.root ?}{? folder.series ?}'
+      retrieve: dirs
+    manipulate:
+      - title:
+          replace:
+            regexp: '$'
+            format: ' S01E01'
+    accept_all: yes
+    if:
+      - tvdb_status == 'Ended': reject
+    list_add:
+      - trakt_list:
+          account: '{? trakt.account ?}'
+          list: '{? trakt.series ?}'
+          type: shows
 
 
 ##### Clean the series that already ended from trakt series list
-#  clean-series-list:
-#    priority: 43
-#    delay: 8 day
-#    template:
-#      - disable-seen-retry
-#      - series-metainfo
-#    trakt_list:
-#      account: '{? trakt.account ?}'
-#      list: '{? trakt.series ?}'
-#      type: shows
-#    if:
-#      - tvdb_status == 'Ended': accept
-#    list_remove:
-#      - trakt_list:
-#          account: '{? trakt.account ?}'
-#          list: '{? trakt.series ?}'
-#          type: shows
+  clean-series-list:
+    priority: 43
+    delay: 8 day
+    template:
+      - disable-seen-retry
+      - series-metainfo
+    trakt_list:
+      account: '{? trakt.account ?}'
+      list: '{? trakt.series ?}'
+      type: shows
+    if:
+      - tvdb_status == 'Ended': accept
+    list_remove:
+      - trakt_list:
+          account: '{? trakt.account ?}'
+          list: '{? trakt.series ?}'
+          type: shows
 
