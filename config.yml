@@ -12,7 +12,7 @@ schedules:
   - tasks: ['purge-*', 'fill-*'] # , '*-rss', '*-magnets'
     schedule:
       minute: 0,30
-  - tasks: ['*-discover', '*-manual']
+  - tasks: ['*-discover', '*-manual', '*-rss']
     schedule:
       minute: 0,15,30,45
 
@@ -391,7 +391,7 @@ tasks:
             category: [2, 18, 41, 49]
 
   download-series-rss: # task
-    priority: 1
+    priority: 15
     template: 
       - series
       - reject
