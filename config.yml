@@ -1,6 +1,9 @@
 variables: secrets.yml
 
-web_server: yes
+web_server:
+  bind: 0.0.0.0
+  port: 5050
+  web_ui: yes
 
 schedules:
   - tasks: ['populate-*', 'clean-*', 'update-*']
@@ -136,6 +139,28 @@ templates:
         - '*.rar'
         - '*.zip'
 
+############# Extra templates #############
+  notify-telegram-found:
+    exec:
+      allow_background: yes
+      auto_escape: yes
+      on_output:
+        for_accepted: /usr/bin/telegram-send --config /config/telegram-send.conf "Found torrent --> {{title}}"
+
+  notify-telegram-newmovie:
+    exec:
+      allow_background: yes
+      auto_escape: yes
+      on_output:
+        for_accepted: /usr/bin/telegram-send --config /config/telegram-send.conf "New movie --> {{title}}"
+        
+  notify-telegram-newseries:
+    exec:
+      allow_background: yes
+      auto_escape: yes
+      on_output:
+        for_accepted: /usr/bin/telegram-send --config /config/telegram-send.conf "New movie --> {{title}}"
+
 ##### ADVANCED SETTINGS #####
 
 ##### Global config
@@ -242,9 +267,9 @@ templates:
         - reject
         - torrents
         - transmission-movies
-        - pushbullet
         - trakt-movies-remove
         - trakt-movies-add
+        - notify-telegram-newmovie
     exists_movie:
       - '/{? folder.root ?}{? folder.movies ?}'
     discover:
@@ -253,18 +278,15 @@ templates:
       what:
         - movie_list: trakt-movies
       from:
-        - iptorrents: 
-            rss_key: '{? iptorrents.rss_key ?}' 
-            uid: 1486500 
-            password: '{? iptorrents.password ?}'
-            category:
-              - 87 #Movies 3D
-              - 48 #Movie HD
-              - 20 #Movie Web DL
-              - Movie-HD-Bluray
-              - Movie-MP4
-              - Movie-BD-Rip
-              - Movie-3D
+        - piratebay:
+            category: highres movies
+            sort_by: seeds
+            url: https://thehiddenbay.com/
+        - limetorrents:
+            category: movies
+        - rarbg:
+            category: [14, 17, 44, 45, 48]
+        - yts: true
 #    list_add:
 #      - trakt_list:
 #          account: '{? trakt.account ?}'
@@ -333,7 +355,7 @@ tasks:
       - series-metainfo
       - series-guessit
       - transmission-series
-      - pushbullet
+      - notify-telegram-newseries
     filesystem:
       path: '/{? folder.root ?}{? folder.series ?}'
       mask: '*.torrent'
@@ -352,25 +374,21 @@ tasks:
       - reject
       - torrents
       - transmission-series
-      - pushbullet
+      - notify-telegram-newseries
     discover:
       release_estimations: ignore
       interval: 5 minutes
       what:
         - next_series_episodes: yes
       from:
-        - iptorrents: 
-            rss_key: '{? iptorrents.rss_key ?}'
-            uid: 1486500 
-            password: '{? iptorrents.password ?}'
-            category: 
-              - TV-480p 
-              - TV-SD-x264
-              - TV-Web-DL
-              - TV-x264  
-              - 99 #TV-x265
-              - TV-MP4
-
+        - piratebay:
+            category: highres tv
+            sort_by: leechers
+            url: https://pirateproxy.ch/
+        - limetorrents:
+            category: tv
+        - rarbg:
+            category: [2, 18, 41, 49]
 
 ##### Remove manually downloaded movies from the movie queue and trakt list
   clean-movie-queue:
@@ -407,7 +425,7 @@ tasks:
       - disable-seen-retry
       - movies-metainfo
       - transmission-movies
-      - pushbullet
+      - notify-telegram-newmovie
       - trakt-movies-remove
     filesystem:
       path: '/{? folder.root ?}{? folder.movies ?}'
@@ -497,7 +515,6 @@ tasks:
     template:
       - disable-seen-retry
       - series-metainfo
-      - pushbullet
     trakt_list:
       account: '{? trakt.account ?}'
       list: '{? trakt.series ?}'
