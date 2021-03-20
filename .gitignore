@@ -1,4 +1,5 @@
 secrets.yml
+telegram-send.conf
 config.yml.*
 *log*
 *sqlite*
