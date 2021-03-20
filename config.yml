@@ -123,6 +123,7 @@ templates:
     _transmission-settings: &transmission-settings
       host: '{? transmission.host ?}'
       port: '{? transmission.port ?}'
+      ratio: 2
 
 ##### Common rejections
   reject:
@@ -365,8 +366,6 @@ tasks:
       on_output:
         for_accepted: rm -f "{{location}}"
 
-
-
 ##### Discover and download older episodes and pilots from recently added series
   download-series-discover:
     priority: 14
@@ -390,6 +389,22 @@ tasks:
             category: tv
         - rarbg:
             category: [2, 18, 41, 49]
+
+  download-series-rss: # task
+    priority: 1
+    template: 
+      - series
+      - reject
+      - torrents
+      - transmission-series
+      - notify-telegram-newseries
+    inputs:
+      - rss: { url: 'https://torrentgalaxy.to/rss.php?cat=41', silent: yes }
+      - rss: { url: 'https://www.limetorrents.cc/rss/20/', silent: yes }
+      - rss: { url: 'https://eztv.it/ezrss.xml', other_fields: ['torrent:magnetURI'], link: 'torrent:magnetURI', silent: yes }
+      - rss: { url: 'http://pirateproxy.ch/rss/top100/205', silent: yes }
+      - rss: { url: 'http://www.torlock.com/movies/rss.xml', silent: yes }
+
 
 ##### Remove manually downloaded movies from the movie queue and trakt list
   clean-movie-queue:
@@ -435,22 +450,36 @@ tasks:
     exec:
       on_output:
         for_accepted: rm -f "{{location}}"
+
+##### Discover and download older episodes and pilots from recently added series
+  download-movies-rss: # task
+    priority: 2
+    template:
+      - download-movies-discover-base
+      - movies-2160p-h264
+    inputs:
+      - rss: { url: 'https://thehiddenbay.com/rss/top100/207', silent: yes }
+      - rss: { url: 'http://extratorrent.cc/rss.xml?cid=4', silent: yes }
+      - rss: { url: 'https://eztv.it/ezrss.xml', other_fields: ['torrent:magnetURI'], link: 'torrent:magnetURI', silent: yes }
+      - rss: { url: 'http://www.torlock.com/movies/rss.xml', silent: yes }
+      - rss: { url: 'https://yts.mx/rss/0/1080p/all/0', silent: yes }
+      - rss: { url: 'https://yts.mx/rss/0/720p/all/0', silent: yes }
           
 
 ##### Discover and download 3D movies
-  download-movies-3D-discover:
-    priority: 24
-    template:
-      - download-movies-discover-base
-      - movies-3d
+#  download-movies-3D-discover:
+#    priority: 24
+#    template:
+#      - download-movies-discover-base
+#      - movies-3d
     
 
 ##### Discover and download 2160p movies
-  download-movies-2160p-webdl-discover:
-    priority: 25
-    template:
-      - download-movies-discover-base
-      - movies-2160p-webdl
+#  download-movies-2160p-webdl-discover:
+#    priority: 25
+#    template:
+#      - download-movies-discover-base
+#      - movies-2160p-webdl
 
   download-movies-2160p-h264-discover:
     priority: 25
@@ -470,11 +499,11 @@ tasks:
 
 
 ##### Discover and download 720p movies, if the movie is not recent
-  download-movies-720p-discover:
-    priority: 27
-    template:
-      - download-movies-discover-base
-      - movies-720p
+#  download-movies-720p-discover:
+#    priority: 27
+#    template:
+#      - download-movies-discover-base
+#      - movies-720p
 
 ##### Clean finished torrents from transmission
 #  clean-transmission:
