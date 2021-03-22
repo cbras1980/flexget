@@ -15,6 +15,9 @@ schedules:
   - tasks: ['*-discover', '*-manual', '*-rss']
     schedule:
       minute: 0,15,30,45
+  - tasks: ['subtitles-download']
+    schedule:
+      hours: 4
 
 templates:
 
@@ -546,7 +549,7 @@ tasks:
           type: shows
 
 ##### Download subtitles task
-  subtitles-discover:
+  subtitles-download:
     priority: 50
     template: 
       - disable-seen-retry
