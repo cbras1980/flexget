@@ -496,12 +496,12 @@ tasks:
 #      - movies-720p
 
 ##### Clean finished torrents from transmission
-  clean-transmission:
-    priority: 37
-    disable: details
-    clean_transmission:
-      <<: *transmission-settings
-      finished_for: 30 day
+#  clean-transmission:
+#    priority: 37
+#    disable: details
+#    clean_transmission:
+#      <<: *transmission-settings
+#      finished_for: 30 day
 
 ##### Update trakt series list from local series folders, excluding the ones that already ended
   update-series-list:
