@@ -319,7 +319,6 @@ tasks:
       settings:
         tracking: no
 
-
 ##### Purge the series list to allow full sync with trakt series list
   purge-series-list:
     priority: 2
@@ -329,7 +328,6 @@ tasks:
     accept_all: yes
     list_remove:
       - entry_list: trakt-series
-
 
 ##### Fetch, format and output trakt series list to a custom entry list
   fill-series-list:
@@ -348,7 +346,6 @@ tasks:
     list_add:
       - entry_list: trakt-series
 
-
 ##### Download episodes from manually downloaded torrents
   download-series-manual:
     priority: 11
@@ -357,7 +354,7 @@ tasks:
       - series-metainfo
       - series-guessit
       - transmission-series
-      - notify-telegram-newseries
+      - notify-telegram-found
     filesystem:
       path: '/{? folder.root ?}{? folder.series ?}'
       mask: '*.torrent'
@@ -374,7 +371,7 @@ tasks:
       - reject
       - torrents
       - transmission-series
-      - notify-telegram-newseries
+      - notify-telegram-found
     discover:
       release_estimations: ignore
       interval: 5 minutes
@@ -397,14 +394,13 @@ tasks:
       - reject
       - torrents
       - transmission-series
-      - notify-telegram-newseries
+      - notify-telegram-found
     inputs:
       - rss: { url: 'https://torrentgalaxy.to/rss.php?cat=41', silent: yes }
       - rss: { url: 'https://www.limetorrents.cc/rss/20/', silent: yes }
       - rss: { url: 'https://eztv.it/ezrss.xml', other_fields: ['torrent:magnetURI'], link: 'torrent:magnetURI', silent: yes }
       - rss: { url: 'http://pirateproxy.ch/rss/top100/205', silent: yes }
       - rss: { url: 'http://www.torlock.com/movies/rss.xml', silent: yes }
-
 
 ##### Remove manually downloaded movies from the movie queue and trakt list
   clean-movie-queue:
@@ -420,7 +416,6 @@ tasks:
       regexp: '.*\.(avi|mkv|mp4)$'
     accept_all: yes
 
-
 ##### Fill the movie queue with movies from trakt list
   fill-movie-queue:
     priority: 23
@@ -433,7 +428,6 @@ tasks:
     list_add:
       - movie_list: trakt-movies
 
-
 ##### Download movies manually downloaded torrents
   download-movies-manual:
     priority: 24
@@ -441,7 +435,7 @@ tasks:
       - disable-seen-retry
       - movies-metainfo
       - transmission-movies
-      - notify-telegram-newmovie
+      - notify-telegram-found
       - trakt-movies-remove
     filesystem:
       path: '/{? folder.root ?}{? folder.movies ?}'
@@ -456,7 +450,8 @@ tasks:
     priority: 25
     template:
       - download-movies-discover-base
-      - movies-2160p-h264
+      - movies-1080p
+      - notify-telegram-found
     inputs:
       - rss: { url: 'https://thehiddenbay.com/rss/top100/207', silent: yes }
       - rss: { url: 'http://extratorrent.cc/rss.xml?cid=4', silent: yes }
@@ -464,7 +459,6 @@ tasks:
       - rss: { url: 'http://www.torlock.com/movies/rss.xml', silent: yes }
       - rss: { url: 'https://yts.mx/rss/0/1080p/all/0', silent: yes }
       - rss: { url: 'https://yts.mx/rss/0/720p/all/0', silent: yes }
-          
 
 ##### Discover and download 3D movies
 #  download-movies-3D-discover:
@@ -481,13 +475,11 @@ tasks:
 #      - download-movies-discover-base
 #      - movies-2160p-webdl
 
-  download-movies-2160p-h264-discover:
-    priority: 25
-    template:
-      - download-movies-discover-base
-      - movies-2160p-h264
-
-          
+#  download-movies-2160p-h264-discover:
+#    priority: 25
+#    template:
+#      - download-movies-discover-base
+#      - movies-2160p-h264
 
 ##### Discover and download 1080p movies
   download-movies-1080p-discover:
@@ -495,8 +487,6 @@ tasks:
     template:
       - download-movies-discover-base
       - movies-1080p
-
-
 
 ##### Discover and download 720p movies, if the movie is not recent
 #  download-movies-720p-discover:
@@ -506,13 +496,12 @@ tasks:
 #      - movies-720p
 
 ##### Clean finished torrents from transmission
-#  clean-transmission:
-#    priority: 37
-#    disable: details
-#    clean_transmission:
-#      <<: *transmission-settings
-#      finished_for: 30 day
-
+  clean-transmission:
+    priority: 37
+    disable: details
+    clean_transmission:
+      <<: *transmission-settings
+      finished_for: 30 day
 
 ##### Update trakt series list from local series folders, excluding the ones that already ended
   update-series-list:
@@ -536,7 +525,6 @@ tasks:
           account: '{? trakt.account ?}'
           list: '{? trakt.series ?}'
           type: shows
-
 
 ##### Clean the series that already ended from trakt series list
   clean-series-list:
@@ -581,4 +569,3 @@ tasks:
         opensubtitles:
           username: xonner
           password: 8vvprx53
-
